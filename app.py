@@ -27,7 +27,7 @@ import os
 
 app = Flask(__name__)
 
-DB_PATH = os.path.join(os.path.dirname(__file__), "expenses.db")
+DB_PATH = os.environ.get("DB_PATH", os.path.join(os.path.dirname(__file__), "expenses.db"))
 
 CATEGORIES = ["Food", "Transport", "Utilities", "Shopping", "Entertainment", "Other"]
 
@@ -57,11 +57,31 @@ def init_db():
 
 @app.route("/")
 def index():
+    start_date = request.args.get("start_date", "").strip()
+    end_date   = request.args.get("end_date",   "").strip()
+    category   = request.args.get("category",   "").strip()
+    q          = request.args.get("q",          "").strip()
+
+    conditions, params = [], []
+    if start_date:
+        conditions.append("expense_date >= ?")
+        params.append(start_date)
+    if end_date:
+        conditions.append("expense_date <= ?")
+        params.append(end_date)
+    if category:
+        conditions.append("category = ?")
+        params.append(category)
+    if q:
+        conditions.append("LOWER(note) LIKE ?")
+        params.append(f"%{q.lower()}%")
+
+    where = ("WHERE " + " AND ".join(conditions)) if conditions else ""
+    sql = f"SELECT * FROM expenses {where} ORDER BY expense_date DESC, id DESC"
+
     conn = get_db()
-    expenses = conn.execute(
-        "SELECT * FROM expenses ORDER BY expense_date DESC, id DESC"
-    ).fetchall()
-    total = conn.execute("SELECT COALESCE(SUM(amount), 0) AS total FROM expenses").fetchone()["total"]
+    expenses = conn.execute(sql, params).fetchall()
+    total = sum(e["amount"] for e in expenses)
     conn.close()
     return render_template("index.html", expenses=expenses, total=total, categories=CATEGORIES)
 
@@ -101,4 +121,5 @@ def delete_expense(expense_id):
 
 if __name__ == "__main__":
     init_db()
-    app.run(debug=True, host="0.0.0.0", port=5000)
+    port = int(os.environ.get("PORT", 5000))
+    app.run(debug=True, host="0.0.0.0", port=port)
