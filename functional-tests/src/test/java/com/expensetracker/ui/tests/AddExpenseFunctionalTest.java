@@ -6,14 +6,11 @@ import com.expensetracker.ui.support.DbSeeder;
 import com.microsoft.playwright.Browser;
 import com.microsoft.playwright.Page;
 import com.microsoft.playwright.Playwright;
-import io.qameta.allure.*;
 import org.junit.jupiter.api.*;
 
 import static com.microsoft.playwright.assertions.PlaywrightAssertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThat;
 
-@Epic("Expense Tracker")
-@Feature("Add Expense")
 @Tag("regression")
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
 class AddExpenseFunctionalTest {
@@ -61,9 +58,6 @@ class AddExpenseFunctionalTest {
 
     @Test
     @Tag("smoke")
-    @Story("Add expense")
-    @Severity(SeverityLevel.BLOCKER)
-    @Description("Adding a valid expense submits the form and the new row appears in the list")
     void addExpense_withValidData_appearsInList() {
         listPage.addExpense("25.50", "Food", "2026-01-15", "Lunch");
 
@@ -79,9 +73,6 @@ class AddExpenseFunctionalTest {
 
     @Test
     @Tag("smoke")
-    @Story("Total spent")
-    @Severity(SeverityLevel.CRITICAL)
-    @Description("Total updates correctly after adding a new expense")
     void addExpense_totalUpdates_afterAdding() {
         listPage.addExpense("50.00", "Utilities", "2026-03-01", "Rent");
 
@@ -94,9 +85,6 @@ class AddExpenseFunctionalTest {
     // -------------------------------------------------------------------------
 
     @Test
-    @Story("Add expense")
-    @Severity(SeverityLevel.NORMAL)
-    @Description("Adding multiple expenses one by one shows all in the list")
     void addExpense_multipleExpenses_allAppearInList() {
         listPage.addExpense("10.00", "Food",      "2026-01-01", "coffee");
         listPage.addExpense("20.00", "Transport", "2026-01-02", "bus");
@@ -114,9 +102,6 @@ class AddExpenseFunctionalTest {
 
     @Test
     @Tag("negative")
-    @Story("Add expense")
-    @Severity(SeverityLevel.NORMAL)
-    @Description("Submitting without amount does not add a row — HTML5 required validation blocks submission")
     void addExpense_withMissingAmount_doesNotAddRow() {
         listPage.fillDate("2026-01-15");
         listPage.selectCategory("Food");
@@ -132,9 +117,6 @@ class AddExpenseFunctionalTest {
 
     @Test
     @Tag("negative")
-    @Story("Add expense")
-    @Severity(SeverityLevel.NORMAL)
-    @Description("Submitting without a date does not add a row")
     void addExpense_withMissingDate_doesNotAddRow() {
         listPage.fillAmount("20.00");
         listPage.selectCategory("Food");
@@ -149,9 +131,6 @@ class AddExpenseFunctionalTest {
     // -------------------------------------------------------------------------
 
     @Test
-    @Story("Add expense")
-    @Severity(SeverityLevel.NORMAL)
-    @Description("Each available category can be selected and the expense is added correctly")
     void addExpense_withEachCategory_appearsWithCorrectBadge() {
         String[] categories = {"Food", "Transport", "Utilities", "Shopping", "Entertainment", "Other"};
 

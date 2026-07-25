@@ -6,14 +6,11 @@ import com.expensetracker.ui.support.DbSeeder;
 import com.microsoft.playwright.Browser;
 import com.microsoft.playwright.Page;
 import com.microsoft.playwright.Playwright;
-import io.qameta.allure.*;
 import org.junit.jupiter.api.*;
 
 import static com.microsoft.playwright.assertions.PlaywrightAssertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThat;
 
-@Epic("Expense Tracker")
-@Feature("Delete Expense")
 @Tag("regression")
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
 class DeleteExpenseFunctionalTest {
@@ -62,9 +59,6 @@ class DeleteExpenseFunctionalTest {
 
     @Test
     @Tag("smoke")
-    @Story("Delete expense")
-    @Severity(SeverityLevel.BLOCKER)
-    @Description("Clicking Delete removes the row from the list and row count decreases by one")
     void deleteExpense_removesRowFromList() {
         int before = listPage.rowCount();
         listPage.deleteFirstRow();
@@ -77,9 +71,6 @@ class DeleteExpenseFunctionalTest {
 
     @Test
     @Tag("smoke")
-    @Story("Delete expense")
-    @Severity(SeverityLevel.CRITICAL)
-    @Description("Deleting a specific expense removes only that note from the list")
     void deleteExpense_specificRow_removesOnlyThatNote() {
         listPage.deleteRowContaining("coffee");
 
@@ -94,9 +85,6 @@ class DeleteExpenseFunctionalTest {
 
     @Test
     @Tag("smoke")
-    @Story("Total spent")
-    @Severity(SeverityLevel.CRITICAL)
-    @Description("Total decreases by the deleted expense amount (delete coffee $10 → total 170.00)")
     void deleteExpense_updatesTotal() {
         listPage.deleteRowContaining("coffee");
 
@@ -109,9 +97,6 @@ class DeleteExpenseFunctionalTest {
     // -------------------------------------------------------------------------
 
     @Test
-    @Story("Delete expense")
-    @Severity(SeverityLevel.NORMAL)
-    @Description("Deleting the last remaining expense shows the empty-state message")
     void deleteExpense_lastExpense_showsEmptyState() {
         seeder.reset();
         seeder.insert(15.00, "Food", "2026-01-01", "solo");
@@ -128,9 +113,6 @@ class DeleteExpenseFunctionalTest {
     // -------------------------------------------------------------------------
 
     @Test
-    @Story("Delete expense")
-    @Severity(SeverityLevel.NORMAL)
-    @Description("Deleting all seeded expenses one by one leaves an empty list")
     void deleteExpense_allRows_listBecomesEmpty() {
         while (listPage.rowCount() > 0) {
             listPage.deleteFirstRow();

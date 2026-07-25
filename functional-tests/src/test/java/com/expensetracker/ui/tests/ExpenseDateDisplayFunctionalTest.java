@@ -7,7 +7,6 @@ import com.microsoft.playwright.Browser;
 import com.microsoft.playwright.Locator;
 import com.microsoft.playwright.Page;
 import com.microsoft.playwright.Playwright;
-import io.qameta.allure.*;
 import org.junit.jupiter.api.*;
 
 import java.util.List;
@@ -16,8 +15,6 @@ import java.util.regex.Pattern;
 import static com.microsoft.playwright.assertions.PlaywrightAssertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThat;
 
-@Epic("Expense Tracker")
-@Feature("Date Display")
 @Tag("regression")
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
 class ExpenseDateDisplayFunctionalTest {
@@ -68,9 +65,6 @@ class ExpenseDateDisplayFunctionalTest {
 
     @Test
     @Tag("smoke")
-    @Story("Date display")
-    @Severity(SeverityLevel.NORMAL)
-    @Description("Every date cell in the expense list contains a valid ISO date (YYYY-MM-DD)")
     void dateDisplay_forValidDates_matchesExpectedPattern() {
         Locator dateCells = listPage.dateCells();
         int count = (int) dateCells.count();
@@ -90,9 +84,6 @@ class ExpenseDateDisplayFunctionalTest {
     // -------------------------------------------------------------------------
 
     @Test
-    @Story("Date display")
-    @Severity(SeverityLevel.NORMAL)
-    @Description("Date displayed in UI matches the stored calendar date exactly — no off-by-one due to timezone")
     void dateDisplay_mapsToSameCalendarDate_noOffByOne() {
         seeder.reset();
         seeder.insert(10.00, "Food", "2026-03-15", "timezone-check");
@@ -108,9 +99,6 @@ class ExpenseDateDisplayFunctionalTest {
     // -------------------------------------------------------------------------
 
     @Test
-    @Story("Date display")
-    @Severity(SeverityLevel.NORMAL)
-    @Description("Date column shows all seeded dates correctly without truncation or formatting errors")
     void dateDisplay_allSeededDates_visibleInCorrectOrder() {
         assertThat(listPage.listContains("2026-02-10")).isTrue();
         assertThat(listPage.listContains("2026-02-01")).isTrue();
@@ -124,9 +112,6 @@ class ExpenseDateDisplayFunctionalTest {
 
     @Test
     @Tag("negative")
-    @Story("Date display")
-    @Severity(SeverityLevel.NORMAL)
-    @Description("Page renders without error when an expense with a non-standard date string exists in the DB")
     void dateDisplay_withUnusualDateString_pageStillRenders() {
         seeder.insert(5.00, "Other", "not-a-date", "bad-date-row");
         listPage.navigate();

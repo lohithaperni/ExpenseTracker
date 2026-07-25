@@ -16,8 +16,7 @@
         <playwright.version>1.44.0</playwright.version>
         <junit.version>5.10.2</junit.version>
         <assertj.version>3.25.3</assertj.version>
-        <allure.version>2.27.0</allure.version>
-        <aspectj.version>1.9.22</aspectj.version>
+        <extentreports.version>5.1.1</extentreports.version>
         <sqlite.version>3.45.3.0</sqlite.version>
     </properties>
 
@@ -40,9 +39,9 @@
             <scope>test</scope>
         </dependency>
         <dependency>
-            <groupId>io.qameta.allure</groupId>
-            <artifactId>allure-junit5</artifactId>
-            <version>${allure.version}</version>
+            <groupId>com.aventstack</groupId>
+            <artifactId>extentreports</artifactId>
+            <version>${extentreports.version}</version>
             <scope>test</scope>
         </dependency>
         <dependency>
@@ -61,17 +60,12 @@
                 <version>3.2.5</version>
                 <configuration>
                     <systemPropertyVariables>
-                        <allure.results.directory>${project.build.directory}/allure-results</allure.results.directory>
+                        <extent.report.dir>${project.build.directory}/extent-report</extent.report.dir>
                     </systemPropertyVariables>
                     <includes>
                         <include>**/*FunctionalTest.java</include>
                     </includes>
                 </configuration>
-            </plugin>
-            <plugin>
-                <groupId>io.qameta.allure</groupId>
-                <artifactId>allure-maven</artifactId>
-                <version>2.12.0</version>
             </plugin>
         </plugins>
     </build>

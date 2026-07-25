@@ -6,14 +6,11 @@ import com.expensetracker.ui.support.DbSeeder;
 import com.microsoft.playwright.Browser;
 import com.microsoft.playwright.Page;
 import com.microsoft.playwright.Playwright;
-import io.qameta.allure.*;
 import org.junit.jupiter.api.*;
 
 import static com.microsoft.playwright.assertions.PlaywrightAssertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThat;
 
-@Epic("Expense Tracker")
-@Feature("Expense List")
 @Tag("regression")
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
 class ExpenseListFunctionalTest {
@@ -62,9 +59,6 @@ class ExpenseListFunctionalTest {
 
     @Test
     @Tag("smoke")
-    @Story("View expense list")
-    @Severity(SeverityLevel.BLOCKER)
-    @Description("All seeded expenses appear in the list on page load")
     void viewExpenses_withSeededData_displaysAllRecords() {
         assertThat(listPage.expenseRows()).hasCount(5);
         assertThat(listPage.listContains("coffee")).isTrue();
@@ -78,9 +72,6 @@ class ExpenseListFunctionalTest {
     // -------------------------------------------------------------------------
 
     @Test
-    @Story("View expense list")
-    @Severity(SeverityLevel.NORMAL)
-    @Description("Empty database shows the empty-state message and no table rows")
     void viewExpenses_emptyDatabase_showsEmptyState() {
         seeder.reset();
         listPage.navigate();
@@ -95,9 +86,6 @@ class ExpenseListFunctionalTest {
 
     @Test
     @Tag("smoke")
-    @Story("Total spent")
-    @Severity(SeverityLevel.CRITICAL)
-    @Description("Total displayed equals sum of all seeded expenses (10+25+40+100+5 = 180.00)")
     void viewExpenses_showsCorrectTotalForAllRecords() {
         String total = listPage.totalText();
         assertThat(total).contains("180.00");
@@ -108,9 +96,6 @@ class ExpenseListFunctionalTest {
     // -------------------------------------------------------------------------
 
     @Test
-    @Story("View expense list")
-    @Severity(SeverityLevel.NORMAL)
-    @Description("Category badge appears for each expense row")
     void viewExpenses_eachRow_showsCategoryBadge() {
         assertThat(listPage.listContains("Food")).isTrue();
         assertThat(listPage.listContains("Transport")).isTrue();

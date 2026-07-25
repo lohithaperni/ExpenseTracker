@@ -6,8 +6,8 @@ venv/
 *.egg-info/
 .DS_Store
 
-# Maven build output (exclude generated report)
+# Maven build output (track extent report only)
 functional-tests/target/
-!functional-tests/target/site/
-!functional-tests/target/site/allure-maven-plugin/
+!functional-tests/target/extent-report/
+!functional-tests/target/extent-report/report.html
 
