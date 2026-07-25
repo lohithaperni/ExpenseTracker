@@ -10,4 +10,6 @@ venv/
 functional-tests/target/
 !functional-tests/target/extent-report/
 !functional-tests/target/extent-report/report.html
+functional-tests/.allure/
+functional-tests/allure-results/
 
