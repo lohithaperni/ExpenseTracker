@@ -9,5 +9,3 @@ venv/
 # Maven build output
 functional-tests/target/
 
-# MCP server
-mcp-test-runner/node_modules/
