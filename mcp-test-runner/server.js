@@ -1,10 +1,9 @@
 import { Server } from "@modelcontextprotocol/sdk/server/index.js";
-import { SSEServerTransport } from "@modelcontextprotocol/sdk/server/sse.js";
+import { StdioServerTransport } from "@modelcontextprotocol/sdk/server/stdio.js";
 import {
   CallToolRequestSchema,
   ListToolsRequestSchema,
 } from "@modelcontextprotocol/sdk/types.js";
-import express from "express";
 import { exec } from "child_process";
 import { promisify } from "util";
 import { fileURLToPath } from "url";
@@ -13,7 +12,6 @@ import fs from "fs";
 
 const execAsync = promisify(exec);
 const __dirname  = path.dirname(fileURLToPath(import.meta.url));
-const PORT       = process.env.PORT || 3001;
 
 // Resolve functional-tests dir: mcp-test-runner/../functional-tests
 const FUNCTIONAL_TESTS_DIR = process.env.FUNCTIONAL_TESTS_DIR ||
@@ -85,13 +83,10 @@ server.setRequestHandler(CallToolRequestSchema, async (request) => {
   switch (name) {
     case "run_functional_tests":
       return handleRunTests(args?.tags || "");
-
     case "generate_allure_report":
       return handleGenerateReport();
-
     case "get_test_summary":
       return handleGetSummary();
-
     default:
       return {
         content: [{ type: "text", text: `Unknown tool: ${name}` }],
@@ -103,9 +98,7 @@ server.setRequestHandler(CallToolRequestSchema, async (request) => {
 // ── run_functional_tests ───────────────────────────────────────────────────────
 
 async function handleRunTests(tags) {
-  const tagFilter = tags
-    ? `-Dgroups="${tags}"`
-    : "";
+  const tagFilter = tags ? `-Dgroups="${tags}"` : "";
   const cmd = `${MVN} test ${tagFilter} -B`.trim();
 
   try {
@@ -113,7 +106,7 @@ async function handleRunTests(tags) {
       cwd: FUNCTIONAL_TESTS_DIR,
       timeout: 300_000,
     });
-    const output = (stdout + stderr).trim();
+    const output  = (stdout + stderr).trim();
     const summary = extractMavenSummary(output);
 
     return {
@@ -129,7 +122,7 @@ async function handleRunTests(tags) {
       ],
     };
   } catch (error) {
-    const output = ((error.stdout || "") + (error.stderr || "")).trim();
+    const output  = ((error.stdout || "") + (error.stderr || "")).trim();
     const summary = extractMavenSummary(output);
 
     return {
@@ -160,10 +153,7 @@ async function handleGenerateReport() {
     });
     const reportIndex = path.join(
       FUNCTIONAL_TESTS_DIR,
-      "target",
-      "site",
-      "allure-maven-plugin",
-      "index.html"
+      "target", "site", "allure-maven-plugin", "index.html"
     );
     const exists = fs.existsSync(reportIndex);
 
@@ -180,12 +170,7 @@ async function handleGenerateReport() {
     };
   } catch (error) {
     return {
-      content: [
-        {
-          type: "text",
-          text: `STATUS: FAILED\nERROR: ${error.message}`,
-        },
-      ],
+      content: [{ type: "text", text: `STATUS: FAILED\nERROR: ${error.message}` }],
       isError: true,
     };
   }
@@ -195,25 +180,17 @@ async function handleGenerateReport() {
 
 async function handleGetSummary() {
   const surefireDir = path.join(
-    FUNCTIONAL_TESTS_DIR,
-    "target",
-    "surefire-reports"
+    FUNCTIONAL_TESTS_DIR, "target", "surefire-reports"
   );
 
   if (!fs.existsSync(surefireDir)) {
     return {
-      content: [
-        {
-          type: "text",
-          text: "No surefire-reports directory found. Run the tests first.",
-        },
-      ],
+      content: [{ type: "text", text: "No surefire-reports found. Run the tests first." }],
       isError: true,
     };
   }
 
-  const xmlFiles = fs
-    .readdirSync(surefireDir)
+  const xmlFiles = fs.readdirSync(surefireDir)
     .filter((f) => f.endsWith(".xml") && f.startsWith("TEST-"));
 
   if (xmlFiles.length === 0) {
@@ -227,8 +204,8 @@ async function handleGetSummary() {
   const classResults = [];
 
   for (const file of xmlFiles) {
-    const xml = fs.readFileSync(path.join(surefireDir, file), "utf-8");
-    const tests   = parseInt(xml.match(/tests="(\d+)"/)?.[1]   || "0");
+    const xml     = fs.readFileSync(path.join(surefireDir, file), "utf-8");
+    const tests   = parseInt(xml.match(/tests="(\d+)"/)?.[1]    || "0");
     const failed  = parseInt(xml.match(/failures="(\d+)"/)?.[1] || "0");
     const errors  = parseInt(xml.match(/errors="(\d+)"/)?.[1]   || "0");
     const skipped = parseInt(xml.match(/skipped="(\d+)"/)?.[1]  || "0");
@@ -246,7 +223,7 @@ async function handleGetSummary() {
   }
 
   const totalPassed = totalTests - totalFailed - totalErrors - totalSkipped;
-  const status = totalFailed + totalErrors === 0 ? "ALL PASSED" : "FAILURES DETECTED";
+  const status      = totalFailed + totalErrors === 0 ? "ALL PASSED" : "FAILURES DETECTED";
 
   return {
     content: [
@@ -280,35 +257,7 @@ function extractMavenSummary(output) {
   return summaryLines.length > 0 ? summaryLines.join("\n") : "(no summary found)";
 }
 
-// ─── Express + SSE transport ──────────────────────────────────────────────────
+// ─── Start stdio transport ────────────────────────────────────────────────────
 
-const app = express();
-app.use(express.json());
-
-const transports = {};
-
-app.get("/sse", async (req, res) => {
-  const transport = new SSEServerTransport("/messages", res);
-  transports[transport.sessionId] = transport;
-  res.on("close", () => delete transports[transport.sessionId]);
-  await server.connect(transport);
-});
-
-app.post("/messages", async (req, res) => {
-  const sessionId = req.query.sessionId;
-  const transport = transports[sessionId];
-  if (!transport) {
-    res.status(404).json({ error: "Session not found" });
-    return;
-  }
-  await transport.handlePostMessage(req, res);
-});
-
-app.get("/health", (_req, res) => res.json({ status: "ok", version: "1.0.0" }));
-
-app.listen(PORT, () => {
-  console.log(`MCP test-runner listening on http://localhost:${PORT}`);
-  console.log(`SSE endpoint : http://localhost:${PORT}/sse`);
-  console.log(`Health check : http://localhost:${PORT}/health`);
-  console.log(`Tests dir    : ${FUNCTIONAL_TESTS_DIR}`);
-});
+const transport = new StdioServerTransport();
+await server.connect(transport);
