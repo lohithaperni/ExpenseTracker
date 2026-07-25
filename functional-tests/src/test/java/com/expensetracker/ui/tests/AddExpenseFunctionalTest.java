@@ -83,7 +83,7 @@ class AddExpenseFunctionalTest {
     @Severity(SeverityLevel.CRITICAL)
     @Description("Total updates correctly after adding a new expense")
     void addExpense_totalUpdates_afterAdding() {
-        listPage.addExpense("50.00", "Bills", "2026-03-01", "Rent");
+        listPage.addExpense("50.00", "Utilities", "2026-03-01", "Rent");
 
         String total = listPage.totalText();
         assertThat(total).contains("50.00");
@@ -100,7 +100,7 @@ class AddExpenseFunctionalTest {
     void addExpense_multipleExpenses_allAppearInList() {
         listPage.addExpense("10.00", "Food",      "2026-01-01", "coffee");
         listPage.addExpense("20.00", "Transport", "2026-01-02", "bus");
-        listPage.addExpense("30.00", "Bills",     "2026-01-03", "water");
+        listPage.addExpense("30.00", "Utilities",  "2026-01-03", "water");
 
         assertThat(listPage.expenseRows()).hasCount(3);
         assertThat(listPage.listContains("coffee")).isTrue();
@@ -156,7 +156,6 @@ class AddExpenseFunctionalTest {
         String[] categories = {"Food", "Transport", "Utilities", "Shopping", "Entertainment", "Other"};
 
         for (String cat : categories) {
-            listPage.navigate();
             seeder.reset();
             listPage.navigate();
             listPage.addExpense("1.00", cat, "2026-01-01", cat + "-test");

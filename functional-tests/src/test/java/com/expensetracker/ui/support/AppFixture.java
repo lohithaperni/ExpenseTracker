@@ -2,6 +2,7 @@ package com.expensetracker.ui.support;
 
 import java.io.IOException;
 import java.net.HttpURLConnection;
+import java.net.ServerSocket;
 import java.net.URL;
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -19,7 +20,7 @@ public class AppFixture {
     private Path    dbFilePath;
 
     public AppFixture() {
-        this(5002);
+        this(findFreePort());
     }
 
     public AppFixture(int port) {
@@ -27,6 +28,15 @@ public class AppFixture {
         this.appDir = System.getProperty(
                 "app.dir",
                 Paths.get(System.getProperty("user.dir")).getParent().toString());
+    }
+
+    private static int findFreePort() {
+        try (ServerSocket ss = new ServerSocket(0)) {
+            ss.setReuseAddress(true);
+            return ss.getLocalPort();
+        } catch (IOException e) {
+            return 5002;
+        }
     }
 
     public void start() throws Exception {

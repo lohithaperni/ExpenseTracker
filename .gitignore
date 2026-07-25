@@ -6,6 +6,8 @@ venv/
 *.egg-info/
 .DS_Store
 
-# Maven build output
+# Maven build output (exclude generated report)
 functional-tests/target/
+!functional-tests/target/site/
+!functional-tests/target/site/allure-maven-plugin/
 
