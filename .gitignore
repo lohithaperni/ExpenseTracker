@@ -6,10 +6,12 @@ venv/
 *.egg-info/
 .DS_Store
 
-# Maven build output (track extent report only)
+# Maven build output (track extent report and surefire reports only)
 functional-tests/target/
 !functional-tests/target/extent-report/
 !functional-tests/target/extent-report/report.html
+!functional-tests/target/surefire-reports/
+!functional-tests/target/surefire-reports/*.xml
 functional-tests/.allure/
 functional-tests/allure-results/
 
